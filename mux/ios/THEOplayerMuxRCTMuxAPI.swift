@@ -4,7 +4,7 @@ import UIKit
 import react_native_theoplayer
 import THEOplayerSDK
 import MuxCore
-import MUXSDKStatsTHEOplayer
+import Mux_Stats_THEOplayer
 
 let PROP_DATA = "data"
 let PROP_ENVIRONMENT_KEY = "env_key"
@@ -48,21 +48,21 @@ let PROP_CUSTOM_DATA5 = "custom_5"
 @objc(THEOplayerMuxRCTMuxAPI)
 class THEOplayerMuxRCTMuxAPI: NSObject, RCTBridgeModule {
     @objc var bridge: RCTBridge!
-    
+
     var connectors = [NSNumber: MUXSDKCustomerData]()
-    
+
     static func moduleName() -> String! {
         return "MuxModule"
     }
-    
+
     static func requiresMainQueueSetup() -> Bool {
         return false
     }
-    
+
     @objc(initialize:muxOptions:)
     func initialize(_ node: NSNumber, muxOptions: NSDictionary) -> Void {
         log("[Mux] initialize triggered.")
-        
+
         DispatchQueue.main.async {
             let view = self.bridge.uiManager.view(forReactTag: node) as? THEOplayerRCTView
             if let player = view?.player {
@@ -78,24 +78,24 @@ class THEOplayerMuxRCTMuxAPI: NSObject, RCTBridgeModule {
                 }
                 let customerData = self.buildCustomerData(data!)
                 let name = self.buildPlayerName(node)
-                
+
                 // Start to monitor a given THEOplayer object.
                 MUXSDKStatsTHEOplayer.monitorTHEOplayer(player, name: name, customerData: customerData, softwareVersion: "1.0.0", automaticErrorTracking: true)
                 self.connectors[node] = customerData
-                
+
                 log("[Mux] added connector to view \(node)")
             } else {
                 log("[Mux] Cannot find THEOPlayer for node \(node)")
             }
         }
     }
-    
+
     @objc(changeProgram:data:)
     func changeProgram(_ node: NSNumber, data: NSDictionary) -> Void {
         log("[Mux] changeProgram not available.")
         // Note: not available in iOS connector.
     }
-    
+
     @objc(changeVideo:data:)
     func changeVideo(_ node: NSNumber, data: NSDictionary) -> Void {
         log("[Mux] changeVideo triggered.")
@@ -103,7 +103,7 @@ class THEOplayerMuxRCTMuxAPI: NSObject, RCTBridgeModule {
             MUXSDKStatsTHEOplayer.videoChangeForPlayer(name: self.buildPlayerName(node), customerData: self.buildCustomerData(data))
         }
     }
-    
+
     @objc(notifyError:code:message:context:)
     func notifyError(_ node: NSNumber, code: NSNumber, message: NSString, context: NSString) -> Void {
         log("[Mux] notifyError triggered.")
@@ -111,11 +111,11 @@ class THEOplayerMuxRCTMuxAPI: NSObject, RCTBridgeModule {
             MUXSDKStatsTHEOplayer.dispatchError(name: "ReactNativeTHEOplayer", code: code.stringValue, message: message as String)
         }
     }
-    
+
     private func buildPlayerName(_ node: NSNumber) -> String {
         return  String(format: "%@%d", "ReactNativeTHEOplayer", node)
     }
-    
+
     private func buildCustomerData(_ data: NSDictionary) -> MUXSDKCustomerData {
         let customerData = MUXSDKCustomerData()
         customerData.customerPlayerData = self.buildPlayerData(data)
@@ -125,7 +125,7 @@ class THEOplayerMuxRCTMuxAPI: NSObject, RCTBridgeModule {
         customerData.customData = self.buildCustomData(data)
         return customerData
     }
-    
+
     private func buildPlayerData(_ data: NSDictionary) -> MUXSDKCustomerPlayerData {
         let muxPlayerData = MUXSDKCustomerPlayerData()
         if let environmentKey = data.value(forKey: PROP_ENVIRONMENT_KEY) as? String {
@@ -160,7 +160,7 @@ class THEOplayerMuxRCTMuxAPI: NSObject, RCTBridgeModule {
         }
         return muxPlayerData
     }
-    
+
     private func buildVideoData(_ data: NSDictionary) -> MUXSDKCustomerVideoData {
         let muxVideoData = MUXSDKCustomerVideoData()
         if let videoCdn = data.value(forKey: PROP_VIDEO_CDN) as? String {
@@ -210,7 +210,7 @@ class THEOplayerMuxRCTMuxAPI: NSObject, RCTBridgeModule {
         }
         return muxVideoData
     }
-    
+
     private func buildViewData(_ data: NSDictionary) -> MUXSDKCustomerViewData {
         let viewData = MUXSDKCustomerViewData()
         if let viewSessionId = data.value(forKey: PROP_VIEW_SESSION_ID) as? String {
@@ -218,7 +218,7 @@ class THEOplayerMuxRCTMuxAPI: NSObject, RCTBridgeModule {
         }
         return viewData
     }
-    
+
     private func buildViewerData(_ data: NSDictionary) -> MUXSDKCustomerViewerData {
         let viewerData = MUXSDKCustomerViewerData()
         if let viewerApplicationName = data.value(forKey: PROP_VIEWER_APPLICATION_NAME) as? String {
@@ -226,7 +226,7 @@ class THEOplayerMuxRCTMuxAPI: NSObject, RCTBridgeModule {
         }
         return viewerData
     }
-    
+
     private func buildCustomData(_ data: NSDictionary) -> MUXSDKCustomData {
         let customData = MUXSDKCustomData()
         if let customData1 = data.value(forKey: PROP_CUSTOM_DATA1) as? String {
@@ -246,7 +246,7 @@ class THEOplayerMuxRCTMuxAPI: NSObject, RCTBridgeModule {
         }
         return customData
     }
-       
+
     @objc(destroy:)
     func destroy(_ node: NSNumber) -> Void {
         log("[Mux] destroy triggered.")
@@ -255,11 +255,11 @@ class THEOplayerMuxRCTMuxAPI: NSObject, RCTBridgeModule {
             self.connectors.removeValue(forKey: node)
         }
     }
-    
+
     func view(for node: NSNumber) -> THEOplayerRCTView? {
         self.bridge.uiManager.view(forReactTag: node) as? THEOplayerRCTView
     }
-    
+
     func player(for node: NSNumber) -> THEOplayer? {
         view(for: node)?.player
     }

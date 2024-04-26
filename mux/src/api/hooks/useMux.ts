@@ -1,13 +1,13 @@
 import { PlayerEventType, THEOplayer } from "react-native-theoplayer";
 import { RefObject, useEffect, useRef } from "react";
-import { MuxConnector } from "@theoplayer/react-native-analytics-mux";
+import { MuxConnector, MuxOptions } from "@theoplayer/react-native-analytics-mux";
 
-export function useMux(options: any)
-    : [RefObject<MuxConnector | undefined>, (player: THEOplayer | undefined) => void] {
+export function useMux()
+    : [RefObject<MuxConnector | undefined>, (player: THEOplayer | undefined, options: MuxOptions) => void] {
     const connector = useRef<MuxConnector | undefined>();
     const theoPlayer = useRef<THEOplayer | undefined>();
 
-    const initialize = (player: THEOplayer | undefined) => {
+    const initialize = (player: THEOplayer | undefined, options: MuxOptions) => {
         // Optionally destroy existent connector
         onDestroy();
 

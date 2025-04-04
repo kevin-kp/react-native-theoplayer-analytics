@@ -26,4 +26,11 @@ export interface KeyOSDrmConfiguration extends DRMConfiguration {
      */
     'x-keyos-authorization': string;
   };
+
+  /**
+   * Additional headers that can be sent with the license and certificate requests.
+   */
+  headers?: {
+    [headerName: string]: string;
+  };
 }

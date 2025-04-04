@@ -11,7 +11,8 @@ import {
   fromBase64StringToUint8Array,
 } from 'react-native-theoplayer';
 import { KeyOSDrmConfiguration } from './KeyOSDrmConfiguration';
-import { isKeyOSDrmDRMConfiguration } from './KeyOSDrmUtils';
+import { addConfigurationHeaders, isKeyOSDrmDRMConfiguration } from './KeyOSDrmUtils';
+import { ContentProtectionRequest } from 'react-native-theoplayer/src/api/drm/ContentProtectionRequest';
 
 export class KeyOSDrmFairplayContentProtectionIntegration implements ContentProtectionIntegration {
   private readonly contentProtectionConfiguration: KeyOSDrmConfiguration;
@@ -29,14 +30,7 @@ export class KeyOSDrmFairplayContentProtectionIntegration implements ContentProt
       throw new Error('The KeyOS certificate url has not been correctly configured.');
     }
     request.url = this.contentProtectionConfiguration.fairplay?.certificateURL;
-    const authorization = this.contentProtectionConfiguration.integrationParameters?.['x-keyos-authorization'];
-    if (authorization !== undefined) {
-      request.headers = {
-        ...request.headers,
-        'x-keyos-authorization': authorization,
-      };
-    }
-
+    addConfigurationHeaders(request, this.contentProtectionConfiguration);
     return request;
   }
 
@@ -46,12 +40,7 @@ export class KeyOSDrmFairplayContentProtectionIntegration implements ContentProt
     }
 
     request.url = this.contentProtectionConfiguration.fairplay?.licenseAcquisitionURL;
-    if (this.contentProtectionConfiguration.integrationParameters !== undefined) {
-      request.headers = {
-        ...request.headers,
-        'x-keyos-authorization': this.contentProtectionConfiguration.integrationParameters['x-keyos-authorization'],
-      };
-    }
+    addConfigurationHeaders(request, this.contentProtectionConfiguration);
     const licenseParameters = `spc=${fromUint8ArrayToBase64String(request.body!)}&assetId=${this.contentId}`;
     request.body = fromStringToUint8Array(licenseParameters);
     return request;

@@ -1,6 +1,6 @@
 import { ContentProtectionIntegration, LicenseRequest, MaybeAsync, BufferSource } from 'react-native-theoplayer';
 import { KeyOSDrmConfiguration } from './KeyOSDrmConfiguration';
-import { isKeyOSDrmDRMConfiguration } from './KeyOSDrmUtils';
+import { addConfigurationHeaders, isKeyOSDrmDRMConfiguration } from './KeyOSDrmUtils';
 
 export class KeyOSDrmPlayReadyContentProtectionIntegration implements ContentProtectionIntegration {
   private readonly contentProtectionConfiguration: KeyOSDrmConfiguration;
@@ -17,13 +17,7 @@ export class KeyOSDrmPlayReadyContentProtectionIntegration implements ContentPro
       throw new Error('The PlayReady KeyOS license url has not been correctly configured.');
     }
     request.url = this.contentProtectionConfiguration.playready?.licenseAcquisitionURL;
-    const authorization = this.contentProtectionConfiguration.integrationParameters?.['x-keyos-authorization'];
-    if (authorization !== undefined) {
-      request.headers = {
-        ...request.headers,
-        'x-keyos-authorization': authorization,
-      };
-    }
+    addConfigurationHeaders(request, this.contentProtectionConfiguration);
     return request;
   }
 }

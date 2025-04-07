@@ -17,7 +17,7 @@ export class KeyOSDrmPlayReadyContentProtectionIntegration implements ContentPro
       throw new Error('The PlayReady KeyOS license url has not been correctly configured.');
     }
     request.url = this.contentProtectionConfiguration.playready?.licenseAcquisitionURL;
-    addConfigurationHeaders(request, this.contentProtectionConfiguration);
+    addConfigurationHeaders(request, this.contentProtectionConfiguration, this.contentProtectionConfiguration.playready);
     return request;
   }
 }

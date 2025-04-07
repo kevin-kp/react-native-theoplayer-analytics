@@ -17,7 +17,7 @@ export class KeyOSDrmWidevineContentProtectionIntegration implements ContentProt
       throw new Error('The Widevine KeyOS license url has not been correctly configured.');
     }
     request.url = this.contentProtectionConfiguration.widevine?.licenseAcquisitionURL;
-    addConfigurationHeaders(request, this.contentProtectionConfiguration);
+    addConfigurationHeaders(request, this.contentProtectionConfiguration, this.contentProtectionConfiguration.widevine);
     return request;
   }
 }
